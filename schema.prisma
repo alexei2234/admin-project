@@ -9,37 +9,114 @@ generator client {
 }
 
 model User {
-  id       String  @id @default(cuid())
+  id       Int     @id @default(autoincrement())
   name     String?
   email    String? @unique
   password String?
-  posts    Post[]  @relation("Post_author")
-}
-
-model Post {
-  id          String    @id @default(cuid())
-  title       String?
-  status      String?
-  content     Json?
-  publishDate DateTime?
-  author      User?     @relation("Post_author", fields: [authorId], references: [id])
-  authorId    String?   @map("author")
-  tags        Tag[]     @relation("Post_tags_Tag_posts")
-
-  @@index([authorId])
-}
-
-model Tag {
-  id    String  @id @default(cuid())
-  name  String?
-  posts Post[]  @relation("Post_tags_Tag_posts")
 }
 
 model Address {
-  id      String   @id @default(cuid())
-  country String?
-  city    String?
-  address String?
-  active  Boolean?
-  field   String?
+  id                    Int        @id @default(autoincrement())
+  country               String?
+  city                  String?
+  address               String?
+  active                Boolean?
+  field                 String?
+  employee              Employee?  @relation("Address_employee", fields: [employeeId], references: [id])
+  employeeId            Int?       @map("employee")
+  from_Employee_address Employee[] @relation("Employee_address")
+
+  @@index([employeeId])
+}
+
+model Technology {
+  id              Int     @id @default(autoincrement())
+  name            String?
+  description     String?
+  from_Skill_tech Skill[] @relation("Skill_tech")
+}
+
+model Client {
+  id                               Int                    @id @default(autoincrement())
+  name                             String?
+  description                      String?
+  website                          String?
+  representatives                  ClientRepresentative[] @relation("Client_representatives_many")
+  from_ClientRepresentative_client ClientRepresentative[] @relation("ClientRepresentative_client")
+  from_Project_client              Project[]              @relation("Project_client")
+}
+
+model ClientRepresentative {
+  id                          Int      @id @default(autoincrement())
+  firstName                   String?
+  lastName                    String?
+  email                       String?
+  client                      Client?  @relation("ClientRepresentative_client", fields: [clientId], references: [id])
+  clientId                    Int?     @map("client")
+  from_Client_representatives Client[] @relation("Client_representatives_many")
+
+  @@index([clientId])
+}
+
+model Project {
+  id                    Int        @id @default(autoincrement())
+  name                  String?
+  description           String?
+  startDate             DateTime?
+  client                Client?    @relation("Project_client", fields: [clientId], references: [id])
+  clientId              Int?       @map("client")
+  from_Employee_project Employee[] @relation("Employee_project")
+
+  @@index([clientId])
+}
+
+model Employee {
+  id                    Int                @id @default(autoincrement())
+  firstName             String?
+  lastName              String?
+  entitlement           String?
+  isOnBench             Boolean?
+  level                 EmployeeLevelType?
+  gender                String?
+  manager               Employee?          @relation("Employee_manager", fields: [managerId], references: [id])
+  managerId             Int?               @map("manager")
+  project               Project?           @relation("Employee_project", fields: [projectId], references: [id])
+  projectId             Int?               @map("project")
+  linkedin              String?
+  hiringRank            String?
+  backgroundCheckStatus Boolean?
+  onBoardingStatus      Boolean?
+  source                String?
+  leverLink             String?
+  education             String?
+  employeeType          String?
+  isBillable            String?
+  billRate              Float?
+  address               Address?           @relation("Employee_address", fields: [addressId], references: [id])
+  addressId             Int?               @map("address")
+  from_Address_employee Address[]          @relation("Address_employee")
+  from_Employee_manager Employee[]         @relation("Employee_manager")
+  from_Skill_employee   Skill[]            @relation("Skill_employee")
+
+  @@index([managerId])
+  @@index([projectId])
+  @@index([addressId])
+}
+
+model Skill {
+  id                Int         @id @default(autoincrement())
+  employee          Employee?   @relation("Skill_employee", fields: [employeeId], references: [id])
+  employeeId        Int?        @map("employee")
+  tech              Technology? @relation("Skill_tech", fields: [techId], references: [id])
+  techId            Int?        @map("tech")
+  yearsOfExperience Int?
+
+  @@index([employeeId])
+  @@index([techId])
+}
+
+enum EmployeeLevelType {
+  junior
+  midlevel
+  senior
 }
