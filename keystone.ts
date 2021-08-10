@@ -4,6 +4,8 @@ import { createAuth } from '@keystone-next/auth';
 
 import { lists } from './schema';
 
+require('dotenv').config();
+
 let sessionSecret = process.env.SESSION_SECRET;
 
 if (!sessionSecret) {
@@ -37,7 +39,7 @@ export default withAuth(
   config({
     db: {
       adapter: 'prisma_postgresql',
-      url: process.env.DATABASE_URL || 'postgres://mozart2234@localhost/admin-fsl',
+      url: process.env.DATABASE_URL || ''
     },
     ui: {
       isAccessAllowed: (context) => !!context.session?.data,
